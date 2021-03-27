@@ -15,6 +15,10 @@ import java.util.logging.Logger;
 import sun.rmi.runtime.Log;
 
 public class MenuScreen implements Screen {
+
+    float delay = 1;
+
+
     MainMenuScreen menuScreen;
 
     Vector3 vector3 = new Vector3();
@@ -50,7 +54,7 @@ public class MenuScreen implements Screen {
         startButton = new Texture("startButton.jpg");
         exitButton = new Texture("exitButton.jpg");
         background = new Texture("background.jpg");
-        Cyber =  Gdx.audio.newMusic(Gdx.files.internal("undertreeinrain.mp3"));
+        Cyber =  Gdx.audio.newMusic(Gdx.files.internal("Cyber.mp3"));
         Cyber.setLooping(true);
         Cyber.play();
 
@@ -89,25 +93,18 @@ public class MenuScreen implements Screen {
 
 
     void handleTouch(){
-        // Проверяем были ли касание по экрану?
         if(Gdx.input.justTouched()) {
-            // Получаем координаты касания и устанавливаем эти значения в временный вектор
             vector3.set(Gdx.input.getX(),Gdx.input.getY(), 0);
-            // получаем координаты касания относительно области просмотра нашей камеры
             oCamera.unproject(vector3);
             float touchX = vector3.x;
             float touchY= vector3.y;
-            // обработка касания по кнопке Stare
             if((touchX>=S_startButton.getX()) && touchX<= (S_startButton.getX()+S_startButton.getWidth()) && (touchY>=S_startButton.getY()) && touchY<=(S_startButton.getY()+S_startButton.getHeight()) ){
                 Gdx.app.debug("GameScreen", "my error message");
-                System.out.println("sadad");
-                menuScreen.setScreen((Screen) new Game()); // Переход к экрану игры
+                menuScreen.setScreen( new Vedro(this));
                 Gdx.app.debug("GameScreen", "error");
-                System.out.println("sadad");
             }
-            // обработка касания по кнопке Exit
             else if((touchX>=S_exitButton.getX()) && touchX<= (S_exitButton.getX()+S_exitButton.getWidth()) && (touchY>=S_exitButton.getY()) && touchY<=(S_exitButton.getY()+S_exitButton.getHeight()) ){
-                Gdx.app.exit(); // выход из приложения
+                Gdx.app.exit();
             }
         }
     }
