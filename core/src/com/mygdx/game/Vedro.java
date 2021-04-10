@@ -20,14 +20,17 @@ import java.util.Iterator;
 public class Vedro extends Game implements Screen {
     OrthographicCamera camera;
     SpriteBatch batch;
+    Texture backgroundTexture;
     Texture rain;
-    Texture vedro;
-    Sprite ff;
-    Texture fff;
+    Texture playerModel;
+    Texture space_shipModel;
     Sprite Player;
     Sound dropSound;
+    Sound MhitSound;
     Music rainMusic;
-    Rectangle bucket;
+    Sprite spriteBackground;
+    Rectangle rectPlayer;
+    Rectangle rectSpace_ship;
     Vector3 vector;
     Array<Rectangle> raindrops;
     long lastDropTime;
@@ -45,6 +48,8 @@ public class Vedro extends Game implements Screen {
     }
 
     Vedro(MenuScreen game){
+        float heightY = Gdx.graphics.getHeight();
+        float weightX = Gdx.graphics.getWidth();
 
 
         camera = new OrthographicCamera();
@@ -55,22 +60,37 @@ public class Vedro extends Game implements Screen {
         vector = new Vector3();
 
         rain = new Texture("anamy-removebg-preview (1).png");
-        vedro = new Texture("sp-removebg-preview_cut-photo.ru (1).png");
-        fff = new Texture("button.png");
+        playerModel = new Texture("sp-removebg-preview_cut-photo.ru (1).png");
+        space_shipModel = new Texture("space_ship.png");
+        backgroundTexture = new Texture("background_img.jpg");
 
         dropSound = Gdx.audio.newSound(Gdx.files.internal("waterdrop.wav"));
+        MhitSound =  Gdx.audio.newSound(Gdx.files.internal("hit.wav"));
         rainMusic = Gdx.audio.newMusic(Gdx.files.internal("bombastic.mp3"));
 
         rainMusic.setLooping(true);
+        rainMusic.setVolume(0.5f);
         rainMusic.play();
 
-        ff = new Sprite(fff);
 
-        bucket = new Rectangle();
-        bucket.x = 800 / 2 - 64 / 2;
-        bucket.y = 20;
-        bucket.width = 64;
-        bucket.height = 64;
+        rectPlayer = new Rectangle();
+        rectPlayer.x = 800 / 2 - 64 / 2;
+        rectPlayer.y = 20;
+        rectPlayer.width = 64;
+        rectPlayer.height = 64;
+
+
+        rectSpace_ship = new Rectangle();
+        rectSpace_ship.x = 0;
+        rectSpace_ship.y =-60;
+        rectSpace_ship.width = 800;
+        rectSpace_ship.height = 80;
+
+        spriteBackground = new Sprite(backgroundTexture);
+        spriteBackground.setSize(800,480);
+        spriteBackground.setAlpha(1f);
+
+
 
         raindrops = new Array<Rectangle>();
         spawnRaindrop();
@@ -89,12 +109,15 @@ public class Vedro extends Game implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(1, 1, 0.2f, 1);
+
+        Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         camera.update();
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        batch.draw(vedro, bucket.x, bucket.y);
+        spriteBackground.draw(batch);
+        batch.draw(space_shipModel,rectSpace_ship.x,rectSpace_ship.y);
+        batch.draw(playerModel, rectPlayer.x, rectPlayer.y);
         for (Rectangle raindrop : raindrops) {
             batch.draw(rain, raindrop.x, raindrop.y);
         }
@@ -105,42 +128,42 @@ public class Vedro extends Game implements Screen {
         if (Gdx.input.isTouched()) {
             vector.set(Gdx.input.getX(), Gdx.input.getY(), 0);
             camera.unproject(vector);
-            bucket.x = (int) (vector.x - 64 / 2);
-            bucket.y = (int) (vector.y - 64 / 2);
+            rectPlayer.x = (int) (vector.x - 64 / 2);
+            rectPlayer.y = (int) (vector.y - 64 / 2);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-            bucket.y += 10000 * Gdx.graphics.getDeltaTime();
+            rectPlayer.y += 10000 * Gdx.graphics.getDeltaTime();
         }
         if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)) {
-            bucket.x += 10000 * Gdx.graphics.getDeltaTime();
+            rectPlayer.x += 10000 * Gdx.graphics.getDeltaTime();
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
-            bucket.x -= 500 * Gdx.graphics.getDeltaTime();
+            rectPlayer.x -= 500 * Gdx.graphics.getDeltaTime();
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-            bucket.x += 500 * Gdx.graphics.getDeltaTime();
+            rectPlayer.x += 500 * Gdx.graphics.getDeltaTime();
 
 
         if (Gdx.input.isKeyPressed(Input.Keys.A))
-            bucket.x -= 500 * Gdx.graphics.getDeltaTime();
+            rectPlayer.x -= 500 * Gdx.graphics.getDeltaTime();
 
         if (Gdx.input.isKeyPressed(Input.Keys.D))
-            bucket.x += 500 * Gdx.graphics.getDeltaTime();
+            rectPlayer.x += 500 * Gdx.graphics.getDeltaTime();
 
 
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) bucket.y -= 600 * Gdx.graphics.getDeltaTime();
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) bucket.y += 600 * Gdx.graphics.getDeltaTime();
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) rectPlayer.y -= 600 * Gdx.graphics.getDeltaTime();
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) rectPlayer.y += 600 * Gdx.graphics.getDeltaTime();
 
 
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) bucket.y -= 200 * Gdx.graphics.getDeltaTime();
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) bucket.y += 200 * Gdx.graphics.getDeltaTime();
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) rectPlayer.y -= 200 * Gdx.graphics.getDeltaTime();
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) rectPlayer.y += 200 * Gdx.graphics.getDeltaTime();
 
 
-        if (this.bucket.x < 0) bucket.x = 800 - 64;
-        if (bucket.x > 800 - 64) bucket.x = 0;
+        if (this.rectPlayer.x < 0) rectPlayer.x = 800 - 64;
+        if (rectPlayer.x > 800 - 64) rectPlayer.x = 0;
 
-        if (bucket.y < 0) bucket.y = 480 - 64;
-        if (bucket.y > 480 - 64) bucket.y = 0;
+        if (rectPlayer.y < 0) rectPlayer.y = 480 - 64;
+        if (rectPlayer.y > 480 - 64) rectPlayer.y = 0;
 
         if (TimeUtils.nanoTime() - lastDropTime > 1000000000) spawnRaindrop();
 
@@ -148,12 +171,14 @@ public class Vedro extends Game implements Screen {
         while (iter.hasNext()) {
             Rectangle raindrop = iter.next();
             raindrop.y -= 200 * Gdx.graphics.getDeltaTime();
-            if (raindrop.y + 64 < 0) iter.remove();
-            if (raindrop.overlaps(bucket)) {
+            if (raindrop.y + 64 < 18) iter.remove();
+            if (raindrop.overlaps(rectPlayer)) {
+                MhitSound.play();
+                iter.remove();
+            }
+            if (raindrop.overlaps(rectSpace_ship)){
                 dropSound.play();
                 iter.remove();
-
-
             }
         }
     }
@@ -182,7 +207,8 @@ public class Vedro extends Game implements Screen {
     @Override
     public void dispose() {
         rain.dispose();
-        vedro.dispose();
+        playerModel.dispose();
+        space_shipModel.dispose();
         dropSound.dispose();
         rainMusic.dispose();
         batch.dispose();
