@@ -51,7 +51,7 @@ public class MenuScreen implements Screen {
         sBatch = new SpriteBatch();
 
 
-        startButton = new Texture("startButton.jpg");
+        startButton = new Texture("ban1.jpg");
         exitButton = new Texture("exitButton.jpg");
         background = new Texture("background.jpg");
         Cyber =  Gdx.audio.newMusic(Gdx.files.internal("Cyber.mp3"));

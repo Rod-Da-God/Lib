@@ -17,11 +17,14 @@ import com.badlogic.gdx.math.Rectangle;
 
 import java.util.Iterator;
 
-public class Vedro implements Screen {
+public class Vedro extends Game implements Screen {
     OrthographicCamera camera;
     SpriteBatch batch;
-    Texture dropImage;
-    Texture bucketImage;
+    Texture rain;
+    Texture vedro;
+    Sprite ff;
+    Texture fff;
+    Sprite Player;
     Sound dropSound;
     Music rainMusic;
     Rectangle bucket;
@@ -30,6 +33,7 @@ public class Vedro implements Screen {
     long lastDropTime;
     static Texture backTexture;
     static Sprite backSprite;
+    Vector3 vector3 = new Vector3();
 
     Game game;
 
@@ -50,14 +54,17 @@ public class Vedro implements Screen {
 
         vector = new Vector3();
 
-        dropImage = new Texture("droplet.png");
-        bucketImage = new Texture("bucket.png");
+        rain = new Texture("anamy-removebg-preview (1).png");
+        vedro = new Texture("sp-removebg-preview_cut-photo.ru (1).png");
+        fff = new Texture("button.png");
 
         dropSound = Gdx.audio.newSound(Gdx.files.internal("waterdrop.wav"));
-        rainMusic = Gdx.audio.newMusic(Gdx.files.internal("undertreeinrain.mp3"));
+        rainMusic = Gdx.audio.newMusic(Gdx.files.internal("bombastic.mp3"));
 
         rainMusic.setLooping(true);
         rainMusic.play();
+
+        ff = new Sprite(fff);
 
         bucket = new Rectangle();
         bucket.x = 800 / 2 - 64 / 2;
@@ -67,16 +74,18 @@ public class Vedro implements Screen {
 
         raindrops = new Array<Rectangle>();
         spawnRaindrop();
+
     }
     public void spawnRaindrop() {
         Rectangle raindrop = new Rectangle();
-        raindrop.x = MathUtils.random(0, 800 - 64);
+        raindrop.x = MathUtils.random(0,800-64);
         raindrop.y = 480;
         raindrop.width = 64;
         raindrop.height = 64;
         raindrops.add(raindrop);
         lastDropTime = TimeUtils.nanoTime();
     }
+
 
     @Override
     public void render(float delta) {
@@ -85,11 +94,13 @@ public class Vedro implements Screen {
         camera.update();
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        batch.draw(bucketImage, bucket.x, bucket.y);
+        batch.draw(vedro, bucket.x, bucket.y);
         for (Rectangle raindrop : raindrops) {
-            batch.draw(dropImage, raindrop.x, raindrop.y);
+            batch.draw(rain, raindrop.x, raindrop.y);
         }
         batch.end();
+
+
 
         if (Gdx.input.isTouched()) {
             vector.set(Gdx.input.getX(), Gdx.input.getY(), 0);
@@ -117,8 +128,8 @@ public class Vedro implements Screen {
             bucket.x += 500 * Gdx.graphics.getDeltaTime();
 
 
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) bucket.y -= 200 * Gdx.graphics.getDeltaTime();
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) bucket.y += 200 * Gdx.graphics.getDeltaTime();
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) bucket.y -= 600 * Gdx.graphics.getDeltaTime();
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) bucket.y += 600 * Gdx.graphics.getDeltaTime();
 
 
         if (Gdx.input.isKeyPressed(Input.Keys.S)) bucket.y -= 200 * Gdx.graphics.getDeltaTime();
@@ -152,6 +163,7 @@ public class Vedro implements Screen {
 
     }
 
+
     @Override
     public void pause() {
 
@@ -169,8 +181,8 @@ public class Vedro implements Screen {
 
     @Override
     public void dispose() {
-        dropImage.dispose();
-        bucketImage.dispose();
+        rain.dispose();
+        vedro.dispose();
         dropSound.dispose();
         rainMusic.dispose();
         batch.dispose();
